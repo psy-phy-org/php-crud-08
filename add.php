@@ -31,7 +31,7 @@ if (isset($_POST['add'])) {
           "required" => true,
           "max" => 50,
           "min" => null,
-          "type" => "numeric",
+          "type" => null,
           "disallowWhitespace" => null,
           "disallowZenkaku" => null,
         ],
@@ -39,6 +39,13 @@ if (isset($_POST['add'])) {
 
     $validation = new Validation();
     $errors = $validation->check($name, $conditions);
+
+    $name_error = $errors['name'];
+    $price_error = $errors['price'];
+    $description_error = $errors['description'];
+
+    // var_dump($errors);
+    // exit();
 
     // checking empty fields
     if (! $errors) {
@@ -76,9 +83,8 @@ if (isset($_POST['add'])) {
               placeholder="Enter name">
         </div>
 <?php
-$error = $errors['name'];
-if ($error) {
-    foreach ($error as $msg) {
+if ($name_error) {
+    foreach ($name_error as $msg) {
         echo $msg."<br>";
     }
 }
@@ -89,9 +95,8 @@ if ($error) {
               placeholder="Enter price">
         </div>
 <?php
-$error = $errors['price'];
-if ($error) {
-    foreach ($error as $msg) {
+if ($price_error) {
+    foreach ($price_error as $msg) {
         echo $msg."<br>";
     }
 }
@@ -102,9 +107,8 @@ if ($error) {
               placeholder="Enter description"><?= $crud->h($_POST['description']) ?></textarea>
         </div>
 <?php
-$error = $errors['description'];
-if ($error) {
-    foreach ($error as $msg) {
+if ($description_error) {
+    foreach ($description_error as $msg) {
         echo $msg."<br>";
     }
 }

@@ -4,7 +4,7 @@ require_once('classes/Crud.php');
 require_once('classes/Validation.php');
 
 $crud = new Crud();
-$validation = new Validation();
+
 if (!$_SESSION) {
     // getting id from url
     $id = $_GET['id'];
@@ -47,6 +47,10 @@ if (isset($_POST['update'])) {
 
     $validation = new Validation();
     $errors = $validation->check($name, $conditions);
+
+    $name_error = $errors['name'];
+    $price_error = $errors['price'];
+    $description_error = $errors['description'];
 
 
     if (! $errors) {
@@ -93,9 +97,8 @@ if (isset($_POST['update'])) {
               placeholder="Enter name">
         </div>
 <?php
-$error = $errors['name'];
-if ($error) {
-    foreach ($error as $msg) {
+if ($name_error) {
+    foreach ($name_error as $msg) {
         echo $msg."<br>";
     }
 }
@@ -106,9 +109,8 @@ if ($error) {
               placeholder="Enter price">
         </div>
 <?php
-$error = $errors['price'];
-if ($error) {
-    foreach ($error as $msg) {
+if ($price_error) {
+    foreach ($price_error as $msg) {
         echo $msg."<br>";
     }
 }
@@ -119,9 +121,8 @@ if ($error) {
               placeholder="Enter description"><?= $crud->h($_SESSION['product']['description']) ?></textarea>
         </div>
 <?php
-$error = $errors['description'];
-if ($error) {
-    foreach ($error as $msg) {
+if ($description_error) {
+    foreach ($description_error as $msg) {
         echo $msg."<br>";
     }
 }
