@@ -16,20 +16,40 @@ if (!$_SESSION) {
 }
 
 if (isset($_POST['update'])) {
-    $msg = $validation->checkEmpty($_POST, array('name', 'price', 'description'));
-    $check_price = $validation->IsNumericValid($_POST['price']);
-    $check_description = $validation->isMaxlengthValid($_POST['description']);
-    // checking empty fields
-    if ($msg != null) {
-        $status = $msg;
-        $_SESSION['product'] = $_POST;
-    } elseif (! $check_price) {
-        $status = 'Please provide proper price.';
-        $_SESSION['product'] = $_POST;
-    } elseif (! $check_description) {
-        $status = 'Please provide proper description.';
-        $_SESSION['product'] = $_POST;
-    } else {
+    $name = $_POST;
+
+    $conditions = [
+            "name" => [
+                "required" => true,
+                "max" => 20,
+                "min" => null,
+                "type" => null, // (null / alphabet / numeric / alphabet&numeric / alphabet&numeric&symbols / email / url / tel）
+                "disallowWhitespace" => true,
+                "disallowZenkaku" => null,
+            ],
+            "price" => [
+                "required" => true,
+                "max" => 5,
+                "min" => 2,
+                "type" => "numeric",
+                "disallowWhitespace" => null,
+                "disallowZenkaku" => null,
+            ],
+            "description" => [
+              "required" => true,
+              "max" => 50,
+              "min" => null,
+              "type" => null,
+              "disallowWhitespace" => null,
+              "disallowZenkaku" => null,
+            ],
+        ];
+
+    $validation = new Validation();
+    $errors = $validation->check($name, $conditions);
+
+
+    if (! $errors) {
         // updating the table
         $sql = 'UPDATE products SET name=?, price=?, description=? WHERE id=?';
         $array = [
@@ -70,18 +90,42 @@ if (isset($_POST['update'])) {
         <div>
           <label for="name">Product name: </label>
           <input type="text" id="name" name="name" value="<?= $crud->h($_SESSION['product']['name']) ?>"
-              placeholder="Enter name" required>
+              placeholder="Enter name">
         </div>
+<?php
+$error = $errors['name'];
+if ($error) {
+    foreach ($error as $msg) {
+        echo $msg."<br>";
+    }
+}
+?>
         <div>
           <label for="price">Price: </label>
           <input type="text" id="price" name="price" value="<?= $crud->h($_SESSION['product']['price']) ?>"
-              placeholder="Enter price" required>
+              placeholder="Enter price">
         </div>
+<?php
+$error = $errors['price'];
+if ($error) {
+    foreach ($error as $msg) {
+        echo $msg."<br>";
+    }
+}
+?>
         <div>
           <label for="description">Description: </label>
           <textarea name="description" rows="2"
-              placeholder="Enter description" required><?= $crud->h($_SESSION['product']['description']) ?></textarea>
+              placeholder="Enter description"><?= $crud->h($_SESSION['product']['description']) ?></textarea>
         </div>
+<?php
+$error = $errors['description'];
+if ($error) {
+    foreach ($error as $msg) {
+        echo $msg."<br>";
+    }
+}
+?>
         <div>
           <input type="hidden" name="id" value="<?= $crud->h($_GET['id']) ?>">
           <input type="submit" name="update" value="Update">

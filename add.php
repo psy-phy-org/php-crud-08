@@ -4,20 +4,44 @@ require_once('classes/Crud.php');
 require_once('classes/Validation.php');
 
 $crud = new Crud();
-$validation = new Validation();
 
 if (isset($_POST['add'])) {
-    $msg = $validation->checkEmpty($_POST, array('name', 'price', 'description'));
-    $check_price = $validation->isNumericValid($_POST['price']);
-    $check_description = $validation->isMaxlengthValid($_POST['description']);
+    // 連想配列で値を渡す
+    $name = $_POST;
+
+    // 評価内容を定義
+    $conditions = [
+        "name" => [
+            "required" => true, // true->必須
+            "max" => 20, // 最大文字数
+            "min" => null, // 最小文字数
+            "type" => null, // 許容形式（null / alphabet / numeric / alphabet&numeric / alphabet&numeric&symbols / email / url / tel）
+            "disallowWhitespace" => true, // 空白文字を禁止するか
+            "disallowZenkaku" => null, // 全角文字を禁止するか
+        ],
+        "price" => [
+            "required" => true,
+            "max" => 5,
+            "min" => 2,
+            "type" => "numeric",
+            "disallowWhitespace" => null,
+            "disallowZenkaku" => null,
+        ],
+        "description" => [
+          "required" => true,
+          "max" => 50,
+          "min" => null,
+          "type" => "numeric",
+          "disallowWhitespace" => null,
+          "disallowZenkaku" => null,
+        ],
+    ];
+
+    $validation = new Validation();
+    $errors = $validation->check($name, $conditions);
+
     // checking empty fields
-    if ($msg != null) {
-        $status = $msg;
-    } elseif (! $check_price) {
-        $status = 'Please provide proper price.';
-    } elseif (! $check_description) {
-        $status = 'Please provide proper description.';
-    } else {
+    if (! $errors) {
         // if all the fields are filled (not empty)
         // insert data to database
         $sql = 'INSERT INTO products VALUES(?,?,?,?)';
@@ -49,18 +73,42 @@ if (isset($_POST['add'])) {
         <div>
           <label for="name">Product name: </label><br>
           <input type="text" id="name" name="name" value="<?= $crud->h($_POST['name']) ?>"
-              placeholder="Enter name" required>
+              placeholder="Enter name">
         </div>
+<?php
+$error = $errors['name'];
+if ($error) {
+    foreach ($error as $msg) {
+        echo $msg."<br>";
+    }
+}
+?>
         <div>
           <label for="price">Price: </label><br>
           <input type="text" id="price" name="price" value="<?= $crud->h($_POST['price']) ?>"
-              placeholder="Enter price" required>
+              placeholder="Enter price">
         </div>
+<?php
+$error = $errors['price'];
+if ($error) {
+    foreach ($error as $msg) {
+        echo $msg."<br>";
+    }
+}
+?>
         <div>
           <label for="description">Description: </label><br>
           <textarea name="description" rows="2"
-              placeholder="Enter description" required><?= $crud->h($_POST['description']) ?></textarea>
+              placeholder="Enter description"><?= $crud->h($_POST['description']) ?></textarea>
         </div>
+<?php
+$error = $errors['description'];
+if ($error) {
+    foreach ($error as $msg) {
+        echo $msg."<br>";
+    }
+}
+?>
         <div><input type="submit" name="add" value="Add"></div>
       </fieldset>
     </form>
