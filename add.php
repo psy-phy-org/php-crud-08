@@ -38,6 +38,7 @@ if (isset($_POST['add'])) {
     ];
 
     $validation = new Validation();
+
     $errors = $validation->check($name, $conditions);
 
     $name_error = $errors['name'];

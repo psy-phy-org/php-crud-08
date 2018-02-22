@@ -46,6 +46,7 @@ if (isset($_POST['update'])) {
         ];
 
     $validation = new Validation();
+
     $errors = $validation->check($name, $conditions);
 
     $name_error = $errors['name'];
